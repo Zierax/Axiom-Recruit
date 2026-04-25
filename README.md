@@ -4,7 +4,7 @@
 
 Axiom-Recruit is a senior-level logic engine designed to evaluate hiring decisions through the lens of mathematical excellence, market alignment, and the "Grit Factor." It eliminates black-box bias by providing a full, auditable logic trace for every hiring verdict.
 
-## ًںڑ€ Key Features
+## Key Features
 
 - **Grit Factor (Resource Ratio)**: Automatically boosts candidates who achieve high technical excellence in low-resource environments (e.g., Egypt vs. Silicon Valley).
 - **Multi-Layer Logic**: Combines Domain Scoring, Derived Heuristics, and Deterministic Constraint checking.
@@ -12,7 +12,7 @@ Axiom-Recruit is a senior-level logic engine designed to evaluate hiring decisio
 - **Dynamic Market Scenarios**: Model decisions across different countries (Egypt, USA, Canada, etc.) and technology eras (AI-Current, ML-2016).
 - **AI Extraction Prompts**: Built-in utilities to extract deterministic feature vectors from unstructured CVs and company descriptions.
 
-## ًں›  Installation
+## Installation
 
 ```bash
 git clone https://github.com/Zierax/Axiom-Recruit
@@ -20,7 +20,7 @@ cd Axiom-Recruit
 # No heavy dependencies; standard Python 3.10+
 ```
 
-## ًں“– Usage
+## Usage
 
 ### Standard Evaluation
 Evaluate a candidate against a company and market:
@@ -45,7 +45,7 @@ Initialize or update the `/profiles` folder with synthetic levels and real-world
 python axiom-recruit.py --generate-profiles-library
 ```
 
-## ًں“‚ Documentation
+## Documentation
 
 ### Weight Ledger (Calibration Memory)
 `weight_ledger.json` stores feedback-driven weight adjustments and history.
@@ -59,7 +59,7 @@ Detailed documentation is available in the `/docs` folder:
 - [Engine Logic & Math](docs/engine_logic.md) - How the scoring and Grit Factor work.
 - [Profiles & Markets](docs/profiles_and_markets.md) - Details on synthetic vs. real-world data.
 
-## âڑ–ï¸ڈ Ethics & Transparency
+## Ethics & Transparency
 
 Axiom-Recruit is a **white-box system**. It does not "predict" performance; it **audits** feature sets against explicit corporate and market standards. All weights are adjustable and transparent through the `catalog.py` and `feedback.py` systems.
 
