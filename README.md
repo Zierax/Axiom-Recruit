@@ -2,7 +2,7 @@
 
 **Deterministic, White-box, Reproducible Hiring Audit Engine.**
 
-Axiom-Recruit is a senior-level logic engine designed to evaluate hiring decisions through the lens of mathematical excellence, market alignment, and the "Grit Factor." It eliminates black-box bias by providing a full, auditable logic trace for every hiring verdict.
+Axiom-Recruit is a senior-level logic engine designed to evaluate hiring decisions through the lens of mathematical excellence, market alignment, and the "Grit Factor." It eliminates black-box bias by providing a full, auditable logic trace for every hiring verdict. The root `candidate.json` is the default Ziad Salah profile used by the project.
 
 ## Key Features
 
@@ -57,6 +57,7 @@ This means scores can change over time for the same input if calibration has bee
 
 Detailed documentation is available in the `/docs` folder:
 - [Engine Logic & Math](docs/engine_logic.md) - How the scoring and Grit Factor work.
+- [Logical Path](docs/logic.md) - End-to-end decision flow from input to verdict.
 - [Profiles & Markets](docs/profiles_and_markets.md) - Details on synthetic vs. real-world data.
 
 ## Ethics & Transparency
