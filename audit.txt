@@ -1,0 +1,61 @@
+# Axiom-Recruit Code Audit - Senior Quality & Logic Design Perspective
+
+## 1. System Logic Architecture
+The Axiom-Recruit engine implements a deterministic, white-box evaluation system for hiring decisions. It operates through three distinct logical layers:
+1.  **Primary Domain Layer**: Weighted averages of raw features across Candidate, Company, and Market domains.
+2.  **Derived Metric Layer**: Higher-order heuristics (e.g., Excellence Index, Opportunity Loss Risk, Hiring Inefficiency Drag) that combine primary scores with specific cross-domain features.
+3.  **Correction Layer (White-box NN)**: A deterministic 3-node hidden layer "neural" network that provides a bounded adjustment ([-0.03, 0.03]) based on edge-case patterns like "alignment guards" or "urgency pressure."
+
+## 2. Full Logic Flow
+1.  **Validation**: Inputs are validated for schema version, numeric bounds [0, 1], and cross-feature consistency (e.g., deployment impact vs. execution history).
+2.  **Base Scoring**: Weighted sums are calculated for the three primary domains using base weights from `catalog.py` adjusted by the `weight_ledger.json`.
+3.  **Cross-Domain Mapping**: Fits and alignments (Candidate-Company, Candidate-Market, Company-Market) are calculated using vector distances.
+4.  **Heuristic Calculation**:
+    - `Candidate Excellence Index`: Focuses on innovation and deployment impact.
+    - `Opportunity Loss Risk`: Combines market demand, candidate dominance, and company latency.
+    - `Hiring Inefficiency Drag`: Penalizes score based on bureaucracy and latency.
+5.  **Edge Case Correction**: The `whitebox_nn` evaluates the "state" of the hire and provides a fine-grained adjustment.
+6.  **Hard/Soft Constraints**:
+    - Hard constraints provide a binary "REJECT" signal and cap the score at 0.39.
+    - Soft constraints apply linear penalties.
+7.  **Final Score Aggregation**: A composite weighted formula produces the final score, which is then clamped to [0, 1].
+8.  **Decision Mapping**: The score and derived indices are mapped to one of: `MANDATORY_ACQUISITION`, `STRONG_HIRE`, `CONSIDER`, or `REJECT`.
+
+## 3. Logical Issues & Conflicts
+
+### 3.1. Mathematical Weight Non-Normalization
+- **Conflict**: The positive weights in the final score calculation (found in `engine.py`) sum to **1.08** (0.36 + 0.18 + 0.08 + 0.10 + 0.06 + 0.10 + 0.09 + 0.06 + 0.05) before subtracting penalties and adding adjustments.
+- **Impact**: While the final `_clamp` call prevents overflow, the "relative weight" of a feature is slightly less than its nominal value in the code. A feature with weight 0.36 actually contributes `0.36 / 1.08` of the positive portion of the score.
+
+### 3.2. Decision Latency Drag Counter-Intuitive Mitigation
+- **Conflict**: In `engine.py`, `decision_latency_drag` is calculated as `decision_latency_impact * (1.0 - 0.40 * market_heat_index)`.
+- **Logic Issue**: This means that as the market gets "hotter" (`market_heat_index` increases), the penalty for the company's slowness **decreases**. 
+- **Impact**: In reality, slowness is *more* dangerous in a hot market. While this is partially offset by the `opportunity_loss_risk` (which increases the score), the specific "drag" penalty behaves counter-intuitively relative to market heat.
+
+### 3.3. Contradiction Penalty Attribution
+- **Conflict**: The `contradiction_penalty_adjusted` is subtracted from the final score.
+- **Logic Issue**: Some contradictions are company-side (e.g., "high innovation vs high latency"). 
+- **Impact**: The candidate is penalized for the company's internal dysfunctional patterns. While this might be valid for "hire success probability," it creates a logical conflict where a perfect candidate's score drops because the company profile they are being evaluated against is inconsistent.
+
+### 3.4. Feedback Convergence Speed
+- **Conflict**: The `bounded_delta` in `feedback.py` is capped at **0.01**.
+- **Logic Issue**: To move a feature weight from 1.2 to 1.3 (a 10% change) would require 10 consecutive "maximum divergence" feedback cycles (where the user's rating is 1.0 and the engine's score is 0.0).
+- **Impact**: The system is highly resistant to noise but may feel "stiff" and unresponsive to legitimate user calibration efforts in the short term.
+
+### 3.5. Mandatory Acquisition "Perfect Storm" Constraint
+- **Conflict**: The requirements for `MANDATORY_ACQUISITION` are extremely high and multifaceted (Score >= 0.76, Acquisition Pressure >= 0.80, Excellence >= 0.82, Dominance >= 0.78, Fit >= 0.58).
+- **Logic Issue**: A candidate with a perfect score (1.0) but a slightly lower `candidate_dominance_index` (e.g., 0.75) will only be a `STRONG_HIRE`. 
+- **Impact**: The decision logic for "Mandatory" is essentially a bypass that ignores the main score if certain sub-indices aren't also exceptionally high, potentially leading to "Strong Hire" verdicts for candidates who are mathematically near-perfect but fail one specific secondary index.
+
+### 3.6. Self-Evaluation Neutrality Paradox
+- **Conflict**: In `self_evaluation_mode`, `company_payload` is `None` and substituted with neutral (0.5) features.
+- **Logic Issue**: `_build_hard_constraints` skips `HC-6` and `HC-7` (company-side checks) in this mode.
+- **Impact**: However, `candidate_company_fit` and other cross-domain metrics still use the 0.5 neutral values. This means the self-evaluation is "tethered" to a mediocre company profile, which may skew the candidate's perceived "market readiness" score if that company profile is used as a proxy for the whole market.
+
+### 3.7. Potential Typo in Hard Constraint HC-1
+- **Observation**: `HC-1` checks `candidate_features["consistency_score"] >= 0.40`.
+- **Observation**: `SC-1` (Soft Constraint) triggers if `consistency_score < 0.55` with a penalty of 0.015.
+- **Logic Issue**: If a candidate has a `consistency_score` of 0.45, they pass the Hard Constraint but are immediately hit by a Soft Constraint penalty. This is a "double jeopardy" logic where the threshold for "Pass" is significantly lower than the threshold for "Not Penalized."
+
+## 4. Final Verdict
+The codebase is exceptionally well-structured for deterministic auditing. The "White-box" nature is fully realized through the logical traces and proofs. However, the identified weight non-normalization and the counter-intuitive mitigation of latency drag in hot markets represent the most significant "Logic Design" areas for improvement.

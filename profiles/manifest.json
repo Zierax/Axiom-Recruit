@@ -1,0 +1,35 @@
+{
+  "candidates": [
+    "profiles\\candidates\\level_1_foundation.json",
+    "profiles\\candidates\\level_2_progressing.json",
+    "profiles\\candidates\\level_3_advanced.json",
+    "profiles\\candidates\\level_4_expert.json",
+    "profiles\\candidates\\level_5_principal.json",
+    "profiles\\candidates\\main_ziad_salah.json"
+  ],
+  "companies": [
+    "profiles\\companies\\meta\\real_world_profile.json",
+    "profiles\\companies\\google\\real_world_profile.json",
+    "profiles\\companies\\coveo\\real_world_profile.json",
+    "profiles\\companies\\lazarda\\real_world_profile.json",
+    "profiles\\companies\\nexthink\\real_world_profile.json"
+  ],
+  "markets": [
+    "profiles\\markets\\canada\\ai-current.json",
+    "profiles\\markets\\canada\\ml-2016.json",
+    "profiles\\markets\\canada\\security-current.json",
+    "profiles\\markets\\usa\\ai-current.json",
+    "profiles\\markets\\usa\\ml-2016.json",
+    "profiles\\markets\\usa\\security-current.json",
+    "profiles\\markets\\netherlands\\ai-current.json",
+    "profiles\\markets\\netherlands\\ml-2016.json",
+    "profiles\\markets\\netherlands\\security-current.json",
+    "profiles\\markets\\egypt\\ai-current.json",
+    "profiles\\markets\\egypt\\ml-2016.json",
+    "profiles\\markets\\egypt\\security-current.json",
+    "profiles\\markets\\singapore\\ai-current.json",
+    "profiles\\markets\\singapore\\ml-2016.json",
+    "profiles\\markets\\singapore\\security-current.json"
+  ],
+  "schema_version": "1.0"
+}
